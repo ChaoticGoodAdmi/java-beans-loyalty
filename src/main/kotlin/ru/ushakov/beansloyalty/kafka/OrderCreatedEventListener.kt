@@ -16,7 +16,7 @@ import ru.ushakov.beansloyalty.service.LoyaltySnapshotService
 @Service
 class OrderCreatedEventListener(
     private val eventStoreService: LoyaltyEventStoreService,
-    private val kafkaTemplate: KafkaTemplate<String, LoyaltyUpdatedEvent>,
+    private val kafkaTemplate: KafkaTemplate<String, String>,
     private val objectMapper: ObjectMapper,
     @Value("\${loyalty.bonus-percentage:0.5}") private val bonusPercentage: Double
 ) {
@@ -39,7 +39,8 @@ class OrderCreatedEventListener(
                 data = mapOf("points" to bonusPointsUsed)
             )
             eventStoreService.appendEvent(pointsUsedEvent)
-            kafkaTemplate.send("LoyaltyUpdated", LoyaltyUpdatedEvent(userId, bonusPointsUsed, LoyaltyEventType.POINTS_USED))
+            val kafkaEvent = LoyaltyUpdatedEvent(userId, bonusPointsUsed, LoyaltyEventType.POINTS_USED)
+            kafkaTemplate.send("LoyaltyUpdated", objectMapper.writeValueAsString(kafkaEvent))
         }
 
         if (bonusPointsEarned > 0) {
@@ -50,7 +51,8 @@ class OrderCreatedEventListener(
                 data = mapOf("points" to bonusPointsEarned)
             )
             eventStoreService.appendEvent(pointsAddedEvent)
-            kafkaTemplate.send("LoyaltyUpdated", LoyaltyUpdatedEvent(userId, bonusPointsUsed, LoyaltyEventType.POINTS_ADDED))
+            val kafkaEvent = LoyaltyUpdatedEvent(userId, bonusPointsEarned, LoyaltyEventType.POINTS_ADDED)
+            kafkaTemplate.send("LoyaltyUpdated", objectMapper.writeValueAsString(kafkaEvent))
         }
     }
 
