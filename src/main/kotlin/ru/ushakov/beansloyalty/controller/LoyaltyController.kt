@@ -3,6 +3,7 @@ package ru.ushakov.beansloyalty
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import ru.ushakov.beansloyalty.domain.LoyaltyEvent
 import ru.ushakov.beansloyalty.service.LoyaltyEventStoreService
@@ -14,8 +15,8 @@ class LoyaltyController(
     private val loyaltyEventStoreService: LoyaltyEventStoreService
 ) {
 
-    @GetMapping("/loyalty/{userId}/balance")
-    fun getBalance(@PathVariable userId: String): ResponseEntity<LoyaltyBalanceResponse> {
+    @GetMapping("/loyalty/balance")
+    fun getBalance(@RequestHeader(name = "X-UserId", required = true) userId: String): ResponseEntity<LoyaltyBalanceResponse> {
         val snapshot = snapshotService.getSnapshot(userId)
 
         return if (snapshot != null) {
@@ -31,8 +32,8 @@ class LoyaltyController(
         }
     }
 
-    @GetMapping("/loyalty/{userId}/history")
-    fun getHistory(@PathVariable userId: String): ResponseEntity<List<LoyaltyEvent>> {
+    @GetMapping("/loyalty/history")
+    fun getHistory(@RequestHeader(name = "X-UserId", required = true) userId: String): ResponseEntity<List<LoyaltyEvent>> {
         val userEvents = loyaltyEventStoreService.getUserEvents(userId).sortedBy { it.timestamp }.reversed()
 
         return if (userEvents.isNotEmpty()) {
