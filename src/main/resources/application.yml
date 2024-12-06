@@ -30,3 +30,27 @@ loyalty:
 
 server:
   port: 8004
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    distribution:
+      percentiles:
+        all:
+          - 0.5
+          - 0.95
+          - 0.99
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: "beans-loyalty"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    prometheus:
+      access: unrestricted
