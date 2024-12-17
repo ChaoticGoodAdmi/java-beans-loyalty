@@ -3,7 +3,7 @@ spring:
     name: beans-loyalty
   data:
     mongodb:
-      uri: mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin
+      uri: mongodb://${DB_HOST}/${DB_NAME}?authSource=admin&replicaSet=${DB_REPLICASET}
       database: loyaltyeventstore
     redis:
       host: ${REDIS_HOST:loyalty-redis-svc}
