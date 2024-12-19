@@ -1,13 +1,13 @@
-package ru.ushakov.beansloyalty
+package ru.ushakov.beansloyalty.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import ru.ushakov.beansloyalty.domain.LoyaltyEvent
 import ru.ushakov.beansloyalty.service.LoyaltyEventStoreService
 import ru.ushakov.beansloyalty.service.LoyaltySnapshotService
+import java.time.LocalDateTime
 
 @RestController
 class LoyaltyController(
@@ -28,7 +28,13 @@ class LoyaltyController(
                 )
             )
         } else {
-            ResponseEntity.notFound().build()
+            ResponseEntity.ok(
+                LoyaltyBalanceResponse(
+                    userId = userId,
+                    currentPoints = 0,
+                    lastUpdated = LocalDateTime.now().toString()
+                )
+            )
         }
     }
 
@@ -39,7 +45,7 @@ class LoyaltyController(
         return if (userEvents.isNotEmpty()) {
             ResponseEntity.ok(userEvents)
         } else {
-            ResponseEntity.notFound().build()
+            ResponseEntity.ok(listOf())
         }
     }
 }
